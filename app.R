@@ -1,5 +1,10 @@
 
 
+# __________________________________________________________________________________________________
+# __________________________________________________________________________________________________
+
+
+# Calling required libraries
 library(shiny)
 library(tidyverse)
 library(lubridate)
@@ -8,6 +13,12 @@ library(tidyquant)
 library(plotly)
 library(shinythemes)
 
+
+# __________________________________________________________________________________________________
+# __________________________________________________________________________________________________
+
+
+# Function to fetch ticker price data
 getdata <- function(ticker,start,end){
   start <- as.Date(start)
   end <- as.Date(end)
@@ -21,8 +32,8 @@ getdata <- function(ticker,start,end){
   return(dt)
 }
 
+# Function to process fetched data to fit AH traaing strategy
 sellOpen_buyClose <- function(pricedt){
-  
   dt <- pricedt %>%
     as.data.frame() %>% 
     rownames_to_column("date") %>% 
@@ -45,8 +56,8 @@ sellOpen_buyClose <- function(pricedt){
   return(dt)
 }
 
+# Function to process fetched data to fit intraday trading strategy
 sellClose_buyOpen <- function(pricedt){
-  
   dt <- pricedt %>%
     as.data.frame() %>% 
     rownames_to_column("date") %>% 
@@ -65,8 +76,8 @@ sellClose_buyOpen <- function(pricedt){
   return(dt)
 }
 
+# Function to process fetched data to fit buy-and-hold strategy
 hodl <- function(pricedt){
-  
   dt <- pricedt %>%
     as.data.frame() %>% 
     rownames_to_column("date") %>% 
@@ -89,8 +100,8 @@ hodl <- function(pricedt){
   return(dt)
 }
 
+# Joining processed data from previous functions and drawing ggplotly output
 returns_plot <- function(ticker,pricedt){
-  
   gg <- sellOpen_buyClose(pricedt) %>% 
   left_join(sellClose_buyOpen(pricedt)) %>% 
   left_join(hodl(pricedt)) %>% 
@@ -135,14 +146,19 @@ returns_plot <- function(ticker,pricedt){
     )
   )
 }
-
+ 
+# Main function
 plot_strats <- function(ticker,start,end){
   dt <- getdata(ticker,start,end) 
   returns_plot(ticker,dt)
 }
 
 
-# Define UI for application 
+# __________________________________________________________________________________________________
+# __________________________________________________________________________________________________
+
+
+# (INPUT) Defining UI for application 
 ui <- fluidPage(
   
     theme = shinytheme("simplex"),
@@ -172,18 +188,25 @@ ui <- fluidPage(
     )
 )
 
-# Define server logic required to draw a histogram
+
+# __________________________________________________________________________________________________
+# __________________________________________________________________________________________________
+
+
+# (OUTPUT) Calling defined functions to render output plot
 server <- function(input, output) {
 
     output$outplot <- renderPlotly({
-        ticker <- input$ticker
-        start <- input$start
-        end <- input$end
-      
-        plot_strats(ticker,start,end)
-      
+        plot_strats(input$ticker,
+                    input$start,
+                    input$end)
     })
 }
 
-# Run the application 
+
+# __________________________________________________________________________________________________
+# __________________________________________________________________________________________________
+
+
+# Running the application 
 shinyApp(ui = ui, server = server)
