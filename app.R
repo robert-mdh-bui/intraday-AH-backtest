@@ -126,7 +126,7 @@ returns_plot <- function(ticker,pricedt){
   geom_line()+
   theme_minimal()+
   labs(
-    title = paste("Percentage Change in Value for $", ticker, " for Intraday, AH, and Overall",sep =""),
+    title = paste("Cumulative Percentage Change in Value for $", ticker, " for Intraday, AH, and Overall",sep =""),
     x = "Date",
     y = "% Change",
     col = " "
