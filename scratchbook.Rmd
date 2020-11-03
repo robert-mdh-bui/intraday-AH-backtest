@@ -12,6 +12,7 @@ library(plotly)
 ```
 
 ```{r}
+# Function to fetch ticker price data
 getdata <- function(ticker,start,end){
   start <- as.Date(start)
   end <- as.Date(end)
@@ -25,8 +26,8 @@ getdata <- function(ticker,start,end){
   return(dt)
 }
 
+# Function to process fetched data to fit AH traaing strategy
 sellOpen_buyClose <- function(pricedt){
-  
   dt <- pricedt %>%
     as.data.frame() %>% 
     rownames_to_column("date") %>% 
@@ -49,8 +50,8 @@ sellOpen_buyClose <- function(pricedt){
   return(dt)
 }
 
+# Function to process fetched data to fit intraday trading strategy
 sellClose_buyOpen <- function(pricedt){
-  
   dt <- pricedt %>%
     as.data.frame() %>% 
     rownames_to_column("date") %>% 
@@ -69,8 +70,8 @@ sellClose_buyOpen <- function(pricedt){
   return(dt)
 }
 
+# Function to process fetched data to fit buy-and-hold strategy
 hodl <- function(pricedt){
-  
   dt <- pricedt %>%
     as.data.frame() %>% 
     rownames_to_column("date") %>% 
@@ -93,8 +94,8 @@ hodl <- function(pricedt){
   return(dt)
 }
 
+# Joining processed data from previous functions and drawing ggplotly output
 returns_plot <- function(ticker,pricedt){
-  
   gg <- sellOpen_buyClose(pricedt) %>% 
   left_join(sellClose_buyOpen(pricedt)) %>% 
   left_join(hodl(pricedt)) %>% 
@@ -139,12 +140,12 @@ returns_plot <- function(ticker,pricedt){
     )
   )
 }
-
+ 
+# Main function
 plot_strats <- function(ticker,start,end){
   dt <- getdata(ticker,start,end) 
   returns_plot(ticker,dt)
 }
-
 ```
 
 
